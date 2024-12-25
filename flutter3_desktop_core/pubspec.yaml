@@ -12,6 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # https://pub.dev/packages/window_manager
+  # 这个插件允许 Flutter 桌面应用调整窗口的大小和位置。
+  window_manager: ^0.4.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
