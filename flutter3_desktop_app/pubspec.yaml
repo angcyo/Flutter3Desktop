@@ -13,6 +13,8 @@ dependencies:
 
   flutter3_desktop_core:
     path: ../flutter3_desktop_core
+  flutter3_app:
+    path: ../../Flutter3Core/flutter3_app
 
 dev_dependencies:
   flutter_test:

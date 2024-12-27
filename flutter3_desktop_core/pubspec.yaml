@@ -16,6 +16,8 @@ dependencies:
     path: ../../Flutter3Core/flutter3_basics
   flutter3_widgets:
     path: ../../Flutter3Core/flutter3_widgets
+  flutter3_core:
+    path: ../../Flutter3Core/flutter3_core
 
   # https://pub.dev/packages/window_manager
   # 这个插件允许 Flutter 桌面应用调整窗口的大小和位置。
