@@ -6,6 +6,7 @@ import 'package:window_manager/window_manager.dart';
 
 export 'package:flutter3_basics/flutter3_basics.dart';
 export 'package:flutter3_widgets/flutter3_widgets.dart';
+export 'package:window_manager/window_manager.dart';
 
 part 'src/window/window_ex.dart';
 
