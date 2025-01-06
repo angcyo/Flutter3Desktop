@@ -26,10 +26,13 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
         dropStateInfoSignal.value = DropStateInfo(DropStateEnum.entered);
       },
       onDropLeave: (event) {
-        dropStateInfoSignal.value = DropStateInfo(DropStateEnum.exited);
+        if (dropStateInfoSignal.value?.state != DropStateEnum.done) {
+          dropStateInfoSignal.value = DropStateInfo(DropStateEnum.exited);
+        }
       },
       onDropOver: (event) {
-        if (dropStateInfoSignal.value?.state != DropStateEnum.over) {
+        if (dropStateInfoSignal.value?.state != DropStateEnum.entered ||
+            dropStateInfoSignal.value?.state != DropStateEnum.over) {
           dropStateInfoSignal.value = DropStateInfo(DropStateEnum.entered);
         }
         if (needDropOverSignal) {
@@ -41,12 +44,8 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
           return DropOperation.none;
         }
       },
-      onPerformDrop: (details) async {
-        dropStateInfoSignal.value = DropStateInfo(
-          DropStateEnum.done,
-          dropTextList: await details.session.texts,
-          dropUriList: await details.session.uris,
-        );
+      onPerformDrop: (event) async {
+        await onHandleDropDone(event);
       },
       child: child,
     );
@@ -70,6 +69,16 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
         child: const Center(child: Text("Drop here")),
       ),
     );*/
+  }
+
+  /// 重写此方法, 处理拖拽完成事件
+  @overridePoint
+  FutureOr onHandleDropDone(PerformDropEvent event) async {
+    dropStateInfoSignal.value = DropStateInfo(
+      DropStateEnum.done,
+      dropTextList: await event.session.texts,
+      dropUriList: await event.session.uris,
+    );
   }
 }
 
@@ -117,6 +126,10 @@ enum DropStateEnum {
   /// 拖拽完成
   done,
   ;
+
+  /// 正处于拖拽悬停
+  bool get isDropOver =>
+      this == DropStateEnum.entered || this == DropStateEnum.over;
 }
 
 /// `super_drag_and_drop`
