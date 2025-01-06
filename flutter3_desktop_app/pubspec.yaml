@@ -16,6 +16,19 @@ dependencies:
   flutter3_app:
     path: ../../Flutter3Core/flutter3_app
 
+  # https://pub.dev/packages/super_context_menu
+  # https://pub.dev/packages/collection
+  # https://pub.dev/packages/device_info_plus
+  # https://pub.dev/packages/pixel_snap
+  # https://pub.dev/packages/super_native_extensions
+  super_context_menu: ^0.8.24
+  # https://pub.dev/packages/pixel_snap
+  pixel_snap: ^0.1.5
+
+dependency_overrides:
+  # Because every version of flutter3_desktop_app from path depends on flutter3_app from path which depends on device_info_plus ^11.1.1, every version of flutter3_desktop_app from path requires device_info_plus ^11.1.1.
+  device_info_plus: ^11.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
