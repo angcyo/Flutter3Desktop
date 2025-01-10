@@ -43,7 +43,7 @@ Future initWindow({
 }) async {
   ensureInitialized();
   // 必须加上这一行。
-  await windowManager.ensureInitialized();
+  await $wm.ensureInitialized();
 
   final windowOptions = WindowOptions(
     size: size,
@@ -58,8 +58,12 @@ Future initWindow({
     titleBarStyle: titleBarStyle,
     windowButtonVisibility: windowButtonVisibility,
   );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
+  $wm.waitUntilReadyToShow(windowOptions, () async {
+    await $wm.show();
+    await $wm.focus();
   });
 }
+
+/// [windowManager]
+/// [WindowManager.instance;]
+WindowManager get $wm => WindowManager.instance;
