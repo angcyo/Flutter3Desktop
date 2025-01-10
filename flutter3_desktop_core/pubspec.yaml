@@ -27,14 +27,6 @@ dependencies:
   # https://pub.dev/packages/screen_retriever
   screen_retriever: ^0.2.0
 
-  # https://pub.dev/packages/flutter_acrylic
-  # 适用于 Windows、macOS 和 Linux 上 Flutter 的窗口亚克力、云母和透明效果
-  # https://pub.dev/packages/macos_window_utils
-  flutter_acrylic: ^1.1.4
-  # https://pub.dev/packages/macos_window_utils
-  # platform :osx, '10.14.6'
-  macos_window_utils: ^1.6.1
-
   # https://pub.dev/packages/desktop_drop
   # https://pub.dev/packages/cross_file
   # https://pub.dev/packages/flutter_web_plugins

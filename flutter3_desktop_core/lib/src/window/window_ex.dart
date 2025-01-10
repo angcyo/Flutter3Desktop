@@ -67,9 +67,44 @@ Future initWindow({
   });
 }
 
+/// 扩展
+extension WindowManagerEx on WindowManager {
+  /// 获取主要屏幕信息
+  Future<Map<String, dynamic>> get primaryDisplay async =>
+      (await screenRetriever.getPrimaryDisplay()).toJson();
+
+  /// 获取所有屏幕信息
+  Future<List<Map<String, dynamic>>> get allDisplay async =>
+      (await screenRetriever.getAllDisplays()).map((e) => e.toJson()).toList();
+
+  /// 获取当前鼠标的位置
+  Future<Offset> get cursorScreenPoint async =>
+      screenRetriever.getCursorScreenPoint();
+
+  void _test() {
+    //screenRetriever.getCursorScreenPoint();
+  }
+}
+
 /// [windowManager]
 /// [WindowManager.instance;]
+/// https://pub.dev/packages/window_manager
 WindowManager get $wm => WindowManager.instance;
+
+///https://pub.dev/packages/flutter_acrylic
+//Window get $window => Window;
+
+class ScreenListenerImpl with ScreenListener {
+  /// 监听屏幕事件, 转手一
+  final void Function(String eventName)? onScreenEventAction;
+
+  ScreenListenerImpl({this.onScreenEventAction});
+
+  @override
+  void onScreenEvent(String eventName) {
+    onScreenEventAction?.call(eventName);
+  }
+}
 
 /// [WindowListener] 窗口事件混入
 /// https://github.com/leanflutter/window_manager/blob/main/README-ZH.md#%E7%9B%91%E5%90%AC%E4%BA%8B%E4%BB%B6
@@ -84,10 +119,14 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   /// 是否需要关闭前确认
   bool get enableConfirmClose => false;
 
+  late final ScreenListenerImpl _screenListener =
+      ScreenListenerImpl(onScreenEventAction: onScreenEvent);
+
   @override
   void initState() {
     super.initState();
     $wm.addListener(this);
+    screenRetriever.addListener(_screenListener);
 
     if (enableConfirmClose) {
       () async {
@@ -108,7 +147,22 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   @override
   void dispose() {
     $wm.removeListener(this);
+    screenRetriever.removeListener(_screenListener);
     super.dispose();
+  }
+
+  //--
+
+  /// [onWindowEvent]
+  /// [onScreenEvent]
+  @overridePoint
+  void onScreenEvent(String eventName) {
+    assert(() {
+      () async {
+        l.v("onScreenEvent->$eventName");
+      }();
+      return true;
+    }());
   }
 
   //--
@@ -310,6 +364,8 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     }());
   }
 
+  /// [onWindowEvent]
+  /// [onScreenEvent]
   @override
   void onWindowEvent(String eventName) {
     if (eventName != "move") {
