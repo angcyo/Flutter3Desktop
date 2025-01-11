@@ -25,6 +25,12 @@ dependencies:
   # https://pub.dev/packages/pixel_snap
   pixel_snap: ^0.1.5
 
+  # https://pub.dev/packages/open_dir
+  open_dir: ^0.0.2+1
+
+  # https://pub.dev/packages/open_file
+  open_file: ^3.5.10
+
 dependency_overrides:
   # Because every version of flutter3_desktop_app from path depends on flutter3_app from path which depends on device_info_plus ^11.1.1, every version of flutter3_desktop_app from path requires device_info_plus ^11.1.1.
   device_info_plus: ^11.2.0
