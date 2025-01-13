@@ -7,6 +7,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter3_core/flutter3_core.dart';
 import 'package:screen_retriever/screen_retriever.dart';
+import 'package:super_clipboard/super_clipboard.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -18,6 +19,7 @@ export 'package:super_drag_and_drop/super_drag_and_drop.dart';
 export 'package:window_manager/window_manager.dart';
 
 part 'src/core/drop_ex.dart';
+part 'src/core/clipboard_ex.dart';
 part 'src/window/window_ex.dart';
 
 ///

@@ -4,6 +4,7 @@ part of '../../flutter3_desktop_core.dart';
 /// @author <a href="mailto:angcyo@126.com">angcyo</a>
 /// @date 2025/01/06
 ///
+/// https://pub.dev/packages/super_drag_and_drop
 /// [DropRegion]
 mixin DropStateMixin<T extends StatefulWidget> on State<T> {
   /// 当前的拖拽状态
@@ -72,6 +73,8 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// 重写此方法, 处理拖拽完成事件
+  /// 通过[PerformDropEvent.session.texts]拿到文本信息, 自行处理
+  /// 通过[PerformDropEvent.session.uris]拿到文件Uri信息, 自行处理
   @overridePoint
   FutureOr onHandleDropDone(PerformDropEvent event) async {
     dropStateInfoSignal.value = DropStateInfo(
