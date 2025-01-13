@@ -1,7 +1,8 @@
 name: flutter3_desktop_app
 description: "flutter3_desktop_app package."
 version: 0.0.1
-homepage:
+homepage: https://github.com/angcyo/Flutter3Desktop
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: ^3.6.0
