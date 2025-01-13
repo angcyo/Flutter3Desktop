@@ -32,6 +32,14 @@ dependencies:
   # https://pub.dev/packages/open_file
   open_file: ^3.5.10
 
+  # https://pub.dev/packages/tray_manager
+  # https://pub.dev/packages/menu_base
+  # https://pub.dev/packages/path
+  # https://pub.dev/packages/shortid
+  tray_manager: ^0.3.1
+  menu_base: ^0.1.1
+  shortid: ^0.1.2
+
 dependency_overrides:
   # Because every version of flutter3_desktop_app from path depends on flutter3_app from path which depends on device_info_plus ^11.1.1, every version of flutter3_desktop_app from path requires device_info_plus ^11.1.1.
   device_info_plus: ^11.2.0

@@ -485,7 +485,7 @@ var isRestoreMaximized = false;
 /// Windows窗口虽然最大化了, 但是内部的界面却没有最大化
 /// 此方法在[State.reassemble]中调用, 以便修复bug
 void $restoreMaximizedIfReassemble() {
-  if (isRestoreMaximized) {
+  if (isRestoreMaximized && isWindows) {
     postFrame(() async {
       await $wm.unmaximize();
       await $wm.maximize();
