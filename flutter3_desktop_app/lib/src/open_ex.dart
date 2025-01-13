@@ -16,7 +16,7 @@ extension OpenStringEx on String {
   /// ```
   Future<bool?> openFolderByNative() async {
     assert(() {
-      l.v("使用本机打开文件夹->$this");
+      l.d("使用本机打开文件夹->$this");
       return true;
     }());
     /*final result = await Process.run(isWindows ? "explorer" : "open", [this]);
@@ -27,13 +27,14 @@ extension OpenStringEx on String {
   /// 使用本机能力, 打开文件
   Future<bool?> openFileByNative() async {
     //Process.run('explorer', [this]);
+    //Process.run('open', [this]);
     final extension = exName(false); //import 'package:path/path.dart' as path;
     final type = defaultExtensionMap[extension];
+    final result = await OpenFile.open(this, type: type);
     assert(() {
-      l.v("使用本机打开文件[$extension -> $type]->$this");
+      l.d("使用本机打开文件[$extension -> $type]->$this [${result.type}/${result.message}]");
       return true;
     }());
-    final result = await OpenFile.open(this, type: type);
     return result.type == ResultType.done;
   }
 }
