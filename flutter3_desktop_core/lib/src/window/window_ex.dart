@@ -219,13 +219,17 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   void onSelfWindowSizeChanged({
     bool? isMaximize,
     bool? isUnmaximize,
-  }) {}
+  }) {
+    $saveWindowBounds();
+  }
 
   /// 当窗口位置改变时触发
   /// [onWindowMove]
   /// [onWindowMoved]
   @overridePoint
-  void onSelfWindowPositionChanged() {}
+  void onSelfWindowPositionChanged() {
+    $saveWindowBounds();
+  }
 
   //--
 
