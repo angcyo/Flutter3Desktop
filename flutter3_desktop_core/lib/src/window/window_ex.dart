@@ -43,13 +43,15 @@ Future initWindow({
   String? title,
   TitleBarStyle? titleBarStyle = TitleBarStyle.normal,
   bool? windowButtonVisibility,
+  //--
+  bool? restoreWindowBounds = true /*是否自动恢复窗口位置*/,
 }) async {
   ensureInitialized();
   // 必须加上这一行。
   await $wm.ensureInitialized();
 
   final windowOptions = WindowOptions(
-    size: size,
+    size: restoreWindowBounds == true ? null : size,
     center: center,
     minimumSize: minimumSize,
     maximumSize: maximumSize,
@@ -61,7 +63,18 @@ Future initWindow({
     titleBarStyle: titleBarStyle,
     windowButtonVisibility: windowButtonVisibility,
   );
-  $wm.waitUntilReadyToShow(windowOptions, () async {
+  await $wm.waitUntilReadyToShow(windowOptions, () async {
+    if (restoreWindowBounds == true) {
+      //debugger();
+      /*$restoreWindowBounds(animate: false);*/
+      /*await $wm.maximize();*/
+      /*await $wm.setSize(Size(600,500), animate: false);*/
+      if (await $restoreWindowBounds(animate: false)) {
+        //no op
+      } else if (size != null) {
+        await $wm.setSize(size, animate: false);
+      }
+    }
     await $wm.show();
     await $wm.focus();
   });
@@ -176,10 +189,17 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     _getWindowPosition();
   }
 
-  void _getWindowSize() async {
+  /// [isMaximize] 窗口是否最大化
+  /// [isUnmaximize] 窗口是否取消最大化
+  void _getWindowSize({
+    bool? isMaximize,
+    bool? isUnmaximize,
+  }) async {
     final oldSize = windowSizeMixin;
     windowSizeMixin = await $wm.getSize();
-    if (oldSize != windowSizeMixin) {
+    if (oldSize != windowSizeMixin ||
+        isMaximize == true ||
+        isUnmaximize == true) {
       onSelfWindowSizeChanged();
     }
   }
@@ -196,7 +216,10 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   /// 当窗口大小改变时触发
   /// [onWindowMaximize]
   @overridePoint
-  void onSelfWindowSizeChanged() {}
+  void onSelfWindowSizeChanged({
+    bool? isMaximize,
+    bool? isUnmaximize,
+  }) {}
 
   /// 当窗口位置改变时触发
   /// [onWindowMove]
@@ -274,7 +297,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
       l.v("onWindowMaximize");
       return true;
     }());
-    _getWindowSize();
+    _getWindowSize(isMaximize: true);
   }
 
   /// unmaximize
@@ -284,7 +307,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
       l.v("onWindowUnmaximize");
       return true;
     }());
-    _getWindowSize();
+    _getWindowSize(isUnmaximize: true);
   }
 
   /// minimize
@@ -322,6 +345,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
       l.v("onWindowResized");
       return true;
     }());
+    _getWindowSize();
   }
 
   /// [onWindowEvent]:move
@@ -376,5 +400,91 @@ mixin WindowListenerMixin<T extends StatefulWidget>
         return true;
       }());
     }
+  }
+}
+
+const kWindowBoundsKey = "_windowBounds";
+
+/// 保存窗口大小/位置
+@api
+Future<void> $saveWindowBounds() async {
+  //debugger();
+  final isMaximized = await $wm.isMaximized();
+  final bounds = await $wm.getBounds();
+  final value = isMaximized
+      ? "$isMaximized"
+      : "$isMaximized ${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}";
+  $coreKeys.saveValue(kWindowBoundsKey, value);
+  assert(() {
+    l.d("保存窗口位置->$value");
+    return true;
+  }());
+}
+
+/// [$saveWindowBounds]
+@api
+(bool, Rect)? $getWindowBounds() {
+  final value = $coreKeys.getValue<String>(kWindowBoundsKey);
+  if (value != null) {
+    assert(() {
+      l.d("恢复窗口位置->$value");
+      return true;
+    }());
+    final parts = value.split(" ");
+    if (parts.length == 1) {
+      final isMaximized = parts[0] == "true";
+      return (isMaximized, Rect.zero);
+    } else if (parts.length == 5) {
+      final isMaximized = parts[0] == "true";
+      final left = double.tryParse(parts[1]);
+      final top = double.tryParse(parts[2]);
+      final width = double.tryParse(parts[3]);
+      final height = double.tryParse(parts[4]);
+
+      final bounds = Rect.fromLTWH(left!, top!, width!, height!);
+      return (isMaximized, bounds);
+    }
+  }
+  return null;
+}
+
+/// 恢复窗口大小/位置
+@api
+Future<bool> $restoreWindowBounds({
+  bool animate = false,
+}) async {
+  final pair = $getWindowBounds();
+  if (pair != null) {
+    final isMaximized = pair.$1;
+    final bounds = pair.$2;
+    isRestoreMaximized = isMaximized;
+    /*await $wm.setSize(bounds.size, animate: animate);*/
+    if (isMaximized == true) {
+      await $wm.maximize();
+    } else {
+      await $wm.setBounds(
+        bounds,
+        animate: animate,
+      );
+    }
+    return true;
+  }
+  return false;
+}
+
+/// 是否要恢复至最大化
+@output
+@implementation
+var isRestoreMaximized = false;
+
+/// 在Flutter重启时, 恢复最大化恢复会有bug,
+/// Windows窗口虽然最大化了, 但是内部的界面却没有最大化
+/// 此方法在[State.reassemble]中调用, 以便修复bug
+void $restoreMaximizedIfReassemble() {
+  if (isRestoreMaximized) {
+    postFrame(() async {
+      await $wm.unmaximize();
+      await $wm.maximize();
+    });
   }
 }
