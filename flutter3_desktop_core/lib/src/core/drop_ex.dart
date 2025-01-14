@@ -4,6 +4,9 @@ part of '../../flutter3_desktop_core.dart';
 /// @author <a href="mailto:angcyo@126.com">angcyo</a>
 /// @date 2025/01/06
 ///
+/// 1. 使用[buildDropRegion]创建拖拽区域
+/// 2. 重写[onHandleDropDone]方法实现拖拽完成事件
+///
 /// https://pub.dev/packages/super_drag_and_drop
 /// [DropRegion]
 mixin DropStateMixin<T extends StatefulWidget> on State<T> {
@@ -12,6 +15,9 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
 
   /// 是否需要一直触发拖拽悬停信号, 关闭后节省性能
   bool needDropOverSignal = false;
+
+  /// 当前是否处于拖拽悬停状态
+  bool get isDropOverMixin => dropStateInfoSignal.value?.state.isDropOver == true;
 
   @callPoint
   Widget buildDropRegion(
@@ -81,6 +87,7 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
       DropStateEnum.done,
       dropTextList: await event.session.texts,
       dropUriList: await event.session.uris,
+      dropImageList: await event.session.images,
     );
   }
 }
@@ -104,15 +111,19 @@ class DropStateInfo {
   /// 拖拽文件列表
   final List<Uri>? dropUriList;
 
+  /// 拖拽图片字节数据列表
+  final List<Uint8List>? dropImageList;
+
   const DropStateInfo(
     this.state, {
     this.dropTextList,
     this.dropUriList,
+    this.dropImageList,
   });
 
   @override
   String toString() {
-    return "$runtimeType{state: $state, dropTextList: $dropTextList, dropUriList: $dropUriList}";
+    return "$runtimeType{state: $state, dropTextList: $dropTextList, dropUriList: $dropUriList, dropImageList: $dropImageList}";
   }
 }
 
@@ -144,6 +155,10 @@ extension DropSessionEx on DropSession {
   /// 获取所有文件路径
   Future<List<Uri>> get uris => getValueList(Formats.fileUri, Formats.fileUri);
 
+  /// 获取所有图片字节数据
+  Future<List<Uint8List>> get images =>
+      getFileValueList(Formats.png, Formats.png);
+
   /// 获取所有文件路径
   Future<List<T>> getValueList<T extends Object>(
       DataFormat dataFormat, ValueFormat<T> valueFormat) async {
@@ -155,6 +170,31 @@ extension DropSessionEx on DropSession {
           if (value != null) {
             result.add(value);
           }
+          completer.complete();
+        }, onError: (error) {
+          completer.complete();
+          assert(() {
+            printError(error);
+            return true;
+          }());
+        });
+      } else {
+        completer.complete();
+      }
+    });
+    return result;
+  }
+
+  /// 获取所有图片字节数据
+  Future<List<Uint8List>> getFileValueList<T extends Object>(
+      DataFormat dataFormat, FileFormat valueFormat) async {
+    List<Uint8List> result = [];
+    await items.asyncForEach((item, completer) {
+      final reader = item.dataReader;
+      if (reader != null && reader.canProvide(dataFormat)) {
+        reader.getFile(valueFormat, (file) async {
+          final bytes = await file.readAll();
+          result.add(bytes);
           completer.complete();
         }, onError: (error) {
           completer.complete();
