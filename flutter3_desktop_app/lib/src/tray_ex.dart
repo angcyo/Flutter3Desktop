@@ -31,6 +31,7 @@ mixin TrayListenerStateMixin<T extends StatefulWidget>
   @override
   void onTrayIconRightMouseDown() {
     // do something
+    trayManager.popUpContextMenu();
   }
 
   @override
@@ -48,12 +49,35 @@ mixin TrayListenerStateMixin<T extends StatefulWidget>
 }
 
 /// 设置系统托盘, 需要配合[TrayListenerStateMixin]使用
+/// [iconPath] 资产下的路径`isWindows ? 'assets/ico/app_icon.ico' : 'assets/ico/app_icon.png',`
+///    - 如果图标为空, 则表示清除托盘
 Future<void> setSystemTray(
-  String iconPath, {
+  String? iconPath, {
+  //--
   List<MenuInfo>? menus,
   menu_base.Menu? menu,
+  //--
+  String? title /*windows 下不可用*/,
+  String? tooltip,
 }) async {
-  await trayManager.setIcon(iconPath);
+  if (iconPath == null) {
+    await trayManager.destroy();
+  } else {
+    await trayManager.setIcon(iconPath);
+  }
+  if (title != null) {
+    try {
+      await trayManager.setTitle(title);
+    } catch (e, s) {
+      assert(() {
+        printError(e, s);
+        return true;
+      }());
+    }
+  }
+  if (tooltip != null) {
+    await trayManager.setToolTip(tooltip);
+  }
   /*await trayManager.setIcon(
     Platform.isWindows ? 'images/tray_icon.ico' : 'images/tray_icon.png',
   );*/
