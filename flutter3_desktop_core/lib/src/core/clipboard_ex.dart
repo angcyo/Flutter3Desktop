@@ -22,29 +22,33 @@ Future<T?> readClipboardValue<T extends Object>(
   return null;
 }
 
-/// 读取剪切板图片
+/// 读取剪切板图片字节数据
 @allPlatformFlag
-Future<UiImage?> readClipboardImage() async {
+Future<Uint8List?> readClipboardImageBytes() async {
   final clipboard = SystemClipboard.instance;
   if (clipboard == null) {
     return null; // Clipboard API is not supported on this platform.
   }
   final reader = await clipboard.read();
   if (reader.canProvide(Formats.png)) {
-    UiImage? image;
+    Uint8List? bytes;
     await asyncFuture((completer) {
       reader.getFile(Formats.png, (file) async {
         // Do something with the PNG image
         //final stream = file.getStream();
-        final bytes = await file.readAll();
-        image = await bytes.toImage();
-        completer.complete(image);
+        bytes = await file.readAll();
+        completer.complete(bytes);
       });
     });
-    return image;
+    return bytes;
   }
   return null;
 }
+
+/// 读取剪切板图片
+@allPlatformFlag
+Future<UiImage?> readClipboardImage() async =>
+    (await readClipboardImageBytes())?.toImage();
 
 /// 读取剪切板文本
 @allPlatformFlag

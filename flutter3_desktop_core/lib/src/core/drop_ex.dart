@@ -17,7 +17,8 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
   bool needDropOverSignal = false;
 
   /// 当前是否处于拖拽悬停状态
-  bool get isDropOverMixin => dropStateInfoSignal.value?.state.isDropOver == true;
+  bool get isDropOverMixin =>
+      dropStateInfoSignal.value?.state.isDropOver == true;
 
   @callPoint
   Widget buildDropRegion(
@@ -27,6 +28,7 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
     List<DataFormat> formats = Formats.standardFormats,
   }) {
     return DropRegion(
+      key: ValueKey("DropRegion"),
       formats: formats,
       hitTestBehavior: hitTestBehavior,
       onDropEnter: (event) {
