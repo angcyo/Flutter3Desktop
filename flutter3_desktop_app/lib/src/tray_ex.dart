@@ -57,7 +57,7 @@ Future<void> setSystemTray(
   List<MenuInfo>? menus,
   menu_base.Menu? menu,
   //--
-  String? title /*windows 下不可用*/,
+  String? title /*windows 下不可用, macOS可用*/,
   String? tooltip,
 }) async {
   if (iconPath == null) {
@@ -65,7 +65,7 @@ Future<void> setSystemTray(
   } else {
     await trayManager.setIcon(iconPath);
   }
-  if (title != null) {
+  if (title != null && !isWindows) {
     try {
       await trayManager.setTitle(title);
     } catch (e, s) {
