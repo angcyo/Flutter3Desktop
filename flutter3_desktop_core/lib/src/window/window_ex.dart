@@ -244,21 +244,22 @@ mixin WindowListenerMixin<T extends StatefulWidget>
       bool isPreventClose = await windowManager.isPreventClose();
       if (isPreventClose) {
         showDialog(
-          context: context,
+          context: buildContext!,
           builder: (_) {
             return AlertDialog(
-              title: Text('Are you sure you want to close this window?'),
+              title: Text('Are  you sure you want to close this window?'),
+              /*backgroundColor: Colors.redAccent,*/
               actions: [
                 TextButton(
                   child: Text('No'),
                   onPressed: () {
-                    buildContext?.pop();
+                    buildContext?.popDialog();
                   },
                 ),
                 TextButton(
                   child: Text('Yes'),
                   onPressed: () {
-                    buildContext?.pop();
+                    buildContext?.popDialog();
                     windowManager.destroy();
                   },
                 ),
