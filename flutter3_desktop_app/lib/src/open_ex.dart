@@ -9,11 +9,13 @@ extension OpenStringEx on String {
   /// 使用本机能力, 打开文件夹
   /// ```
   /// Process.run('explorer', [path]); // Windows
-  /// // 对于 macOS 使用以下命令
-  /// // Process.run('open', [path]);
-  /// // 对于 Linux 使用以下命令
-  /// // Process.run('xdg-open', [path]);
+  /// # 对于 macOS 使用以下命令
+  /// # Process.run('open', [path]);
+  /// # 对于 Linux 使用以下命令
+  /// # Process.run('xdg-open', [path]);
   /// ```
+  /// [GlobalConfig.openFileFn]
+  /// [openFilePath]
   Future<bool?> openFolderByNative() async {
     assert(() {
       l.d("使用本机打开文件夹->$this");
