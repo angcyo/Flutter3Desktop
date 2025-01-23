@@ -19,8 +19,8 @@ export 'package:super_clipboard/super_clipboard.dart';
 export 'package:super_drag_and_drop/super_drag_and_drop.dart';
 export 'package:window_manager/window_manager.dart';
 
-part 'src/core/drop_ex.dart';
 part 'src/core/clipboard_ex.dart';
+part 'src/core/drop_ex.dart';
 part 'src/window/window_ex.dart';
 
 ///

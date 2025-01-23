@@ -200,7 +200,10 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     if (oldSize != windowSizeMixin ||
         isMaximize == true ||
         isUnmaximize == true) {
-      onSelfWindowSizeChanged();
+      onSelfWindowSizeChanged(
+        isMaximize: isMaximize,
+        isUnmaximize: isUnmaximize,
+      );
     }
   }
 
@@ -415,8 +418,8 @@ const kWindowBoundsKey = "_windowBounds";
 Future<void> $saveWindowBounds() async {
   //debugger();
   final isMaximized = await $wm.isMaximized();
-  final bounds = await $wm.getBounds();
-  final value = isMaximized
+  final bounds = isMaximized ? ($getWindowBounds()?.$2) : await $wm.getBounds();
+  final value = bounds == null
       ? "$isMaximized"
       : "$isMaximized ${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}";
   $coreKeys.saveValue(kWindowBoundsKey, value);
@@ -432,7 +435,7 @@ Future<void> $saveWindowBounds() async {
   final value = $coreKeys.getValue<String>(kWindowBoundsKey);
   if (value != null) {
     assert(() {
-      l.d("恢复窗口位置->$value");
+      l.d("获取窗口位置->$value");
       return true;
     }());
     final parts = value.split(" ");
@@ -465,7 +468,11 @@ Future<bool> $restoreWindowBounds({
     isRestoreMaximized = isMaximized;
     /*await $wm.setSize(bounds.size, animate: animate);*/
     if (isMaximized == true) {
-      await $wm.maximize();
+      if (await $wm.isMaximized()) {
+        //已最大化
+      } else {
+        await $wm.maximize();
+      }
     } else {
       await $wm.setBounds(
         bounds,
