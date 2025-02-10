@@ -8,6 +8,10 @@ environment:
   sdk: ^3.6.0
   flutter: ">=1.17.0"
 
+# https://dart.dev/tools/pub/workspaces/
+# Support for pub workspaces was introduced in Dart 3.6.0.
+resolution: workspace
+
 dependencies:
   flutter:
     sdk: flutter
@@ -40,9 +44,9 @@ dependencies:
   menu_base: ^0.1.1
   shortid: ^0.1.2
 
-dependency_overrides:
-  # Because every version of flutter3_desktop_app from path depends on flutter3_app from path which depends on device_info_plus ^11.1.1, every version of flutter3_desktop_app from path requires device_info_plus ^11.1.1.
-  device_info_plus: ^11.2.0
+#dependency_overrides:
+#  # Because every version of flutter3_desktop_app from path depends on flutter3_app from path which depends on device_info_plus ^11.1.1, every version of flutter3_desktop_app from path requires device_info_plus ^11.1.1.
+#  device_info_plus: ^11.2.0
 
 dev_dependencies:
   flutter_test:
