@@ -38,7 +38,7 @@ Future initWindow({
   Size? maximumSize,
   bool? alwaysOnTop,
   bool? fullScreen,
-  Color? backgroundColor = Colors.transparent,
+  Color? backgroundColor /*= Colors.transparent*/,
   bool? skipTaskbar = false,
   String? title,
   TitleBarStyle? titleBarStyle = TitleBarStyle.normal,
