@@ -27,7 +27,7 @@ dependencies:
   # 这个插件允许 Flutter 桌面应用调整窗口的大小和位置。
   # https://pub.dev/packages/path
   # https://pub.dev/packages/screen_retriever
-  window_manager: ^0.4.3
+  window_manager: ^0.5.1
   # https://pub.dev/packages/screen_retriever
   screen_retriever: ^0.2.0
 
@@ -41,13 +41,13 @@ dependencies:
   # https://pub.dev/packages/collection
   # https://pub.dev/packages/super_clipboard
   # https://pub.dev/packages/super_native_extensions
-  super_drag_and_drop: ^0.8.24
+  super_drag_and_drop: ^0.9.1
   # https://pub.dev/packages/super_clipboard
   # https://pub.dev/packages/collection
   # https://pub.dev/packages/meta
   # https://pub.dev/packages/super_native_extensions
-  super_clipboard: ^0.8.24
-  super_native_extensions: ^0.8.24
+  super_clipboard: ^0.9.1
+  super_native_extensions: ^0.9.1
 
   # https://pub.dev/packages/hotkey_manager
   hotkey_manager: ^0.2.3
@@ -55,7 +55,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  # in flutter3_basics
+  flutter_lints: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
