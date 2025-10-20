@@ -81,6 +81,9 @@ Future initWindow({
 }
 
 /// 扩展
+///
+/// - [WindowManager.setTitle] 设置窗口标题
+/// - [WindowManager.setFullScreen] 设置窗口全屏
 extension WindowManagerEx on WindowManager {
   /// 获取主要屏幕信息
   Future<Map<String, dynamic>> get primaryDisplay async =>
