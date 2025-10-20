@@ -38,7 +38,7 @@ Future initWindow({
   Size? maximumSize,
   bool? alwaysOnTop,
   bool? fullScreen,
-  Color? backgroundColor /*= Colors.transparent*/,
+  Color? backgroundColor/*= Colors.transparent*/,
   bool? skipTaskbar = false,
   String? title,
   TitleBarStyle? titleBarStyle = TitleBarStyle.normal,
@@ -102,10 +102,20 @@ extension WindowManagerEx on WindowManager {
   }
 }
 
+/// 是否初始化过窗口管理器
+bool _isInitializedWindowManager = false;
+
 /// [windowManager]
 /// [WindowManager.instance;]
 /// https://pub.dev/packages/window_manager
-WindowManager get $wm => WindowManager.instance;
+WindowManager get $wm {
+  final wm = WindowManager.instance;
+  if (!_isInitializedWindowManager) {
+    _isInitializedWindowManager = true;
+    wm.ensureInitialized();
+  }
+  return wm;
+}
 
 ///https://pub.dev/packages/flutter_acrylic
 //Window get $window => Window;
