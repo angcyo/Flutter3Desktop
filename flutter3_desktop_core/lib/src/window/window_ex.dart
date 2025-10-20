@@ -121,7 +121,7 @@ WindowManager get $wm {
 //Window get $window => Window;
 
 class ScreenListenerImpl with ScreenListener {
-  /// 监听屏幕事件, 转手一
+  /// 监听屏幕事件, 转手一边
   final void Function(String eventName)? onScreenEventAction;
 
   ScreenListenerImpl({this.onScreenEventAction});
