@@ -40,7 +40,7 @@ dependencies:
   # https://pub.dev/packages/menu_base
   # https://pub.dev/packages/path
   # https://pub.dev/packages/shortid
-  tray_manager: ^0.5.0
+  tray_manager: ^0.5.2
   menu_base: ^0.1.1
   shortid: ^0.1.2
 
