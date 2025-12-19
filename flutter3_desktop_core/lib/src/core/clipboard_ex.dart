@@ -6,10 +6,77 @@ part of '../../flutter3_desktop_core.dart';
 ///
 /// https://pub.dev/packages/super_clipboard
 
-/// 读取剪切板数据
+//MARK: - read
+
+/// 枚举读取系统剪切板数据
+/// - [ValueFormat]  数值类型返回数据
+///   - [SimpleValueFormat]
+///       - [Formats.fileUri] 复制文件/文件夹 对应这个格式
+///       - `file:///Users/angcyo/Downloads/Untitled.ydp`
+///       - `file:///Users/angcyo/Library/Containers/com.tencent.qq/Data/Library/Application%20Support/QQ/nt_qq_ca465af70ecf541c7c4596e666d14d70/nt_data/Emoji/emoji-recv/2025-12/Ori/f0e5c7ad67cafa73eb8d55ce0b87b373.png`
+///   - [Uri]
+///   - [NamedUri]
+/// - [FileFormat] 文件类型返回[DataReaderFile]
+///   - [SimpleFileFormat] ``
+///       - [Formats.jpeg] 对应这个格式
+///       - [Formats.png] 对应这个格式
+///   - [DataReaderFileValueAdapter] 复制磁盘文件
+///   - [DataReaderVirtualFileAdapter] 直接复制图片
+@allPlatformFlag
+Future eachReadClipboardValue(
+  FutureOr Function(DataFormat format, dynamic value) callback,
+) async {
+  final clipboard = SystemClipboard.instance;
+  if (clipboard == null) {
+    return null; // Clipboard API is not supported on this platform.
+  }
+  final reader = await clipboard.read();
+  for (final format in Formats.standardFormats) {
+    if (reader.canProvide(format)) {
+      if (format is ValueFormat) {
+        final value = await reader.readValue(format);
+        await callback(format, value);
+      } else if (format is FileFormat) {
+        /*Uint8List? bytes;
+        await asyncFuture((completer) {
+          reader.getFile(format, (file) async {
+            */ /*final fileName = file.fileName;
+            debugger();*/ /*
+            assert(() {
+              l.i("fileName:${file.fileName} fileSize:${file.fileSize}");
+              return true;
+            }());
+            bytes = await file.readAll();
+            completer.complete(bytes);
+          });
+        });
+        await callback(format, bytes);*/
+        DataReaderFile? file = await asyncFuture((completer) {
+          reader.getFile(format, (file) async {
+            completer.complete(file);
+          });
+        });
+        await callback(format, file);
+      } else {
+        debugger();
+      }
+    }
+  }
+}
+
+/// 泛型读取系统剪切板数据
+/// - [format] 剪切板数据格式
+///   - [Formats.uri]
+///   - [Formats.fileUri]
+///   - [Formats.png]
+///   - [Formats.plainText]
+///   - [Formats.htmlText]
+/// - [valueFormat] 对应的数据格式
 @allPlatformFlag
 Future<T?> readClipboardValue<T extends Object>(
-    DataFormat format, ValueFormat<T> valueFormat) async {
+  DataFormat format,
+  ValueFormat<T> valueFormat,
+) async {
   final clipboard = SystemClipboard.instance;
   if (clipboard == null) {
     return null; // Clipboard API is not supported on this platform.
@@ -69,10 +136,15 @@ Future<String?> readClipboardText() async {
 
 /// 读取剪切板文件
 @allPlatformFlag
-Future<Uri?> readClipboardUri() =>
+Future<NamedUri?> readClipboardUri() =>
+    readClipboardValue(Formats.uri, Formats.uri);
+
+/// 读取剪切板文件
+@allPlatformFlag
+Future<Uri?> readClipboardUFileUri() =>
     readClipboardValue(Formats.fileUri, Formats.fileUri);
 
-//--
+//MARK: - write
 
 /// 写入剪切板数据
 @allPlatformFlag
@@ -134,7 +206,7 @@ Future<void> writeClipboardHtmlText(String? text) async {
   return await writeClipboardValue(item);
 }
 
-//--
+//MARK: - clear
 
 /// 清空剪切板
 @allPlatformFlag

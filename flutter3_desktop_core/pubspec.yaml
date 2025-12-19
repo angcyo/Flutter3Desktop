@@ -48,9 +48,18 @@ dependencies:
   # https://pub.dev/packages/super_native_extensions
   super_clipboard: ^0.9.1
   super_native_extensions: ^0.9.1
+#  super_native_extensions:
+#    git:
+#      url: git@github.com:FlutterStudioIst/super_native_extensions.git
+#      path: super_native_extensions/
 
   # https://pub.dev/packages/hotkey_manager
   hotkey_manager: ^0.2.3
+
+dependency_overrides:
+  # Because flutter3_desktop_core depends on super_native_extensions ^0.9.1 which depends on device_info_plus >=10.0.1 <12.0.0, device_info_plus >=10.0.1 <12.0.0 is required.
+  # So, because flutter3_app depends on device_info_plus ^12.3.0, version solving failed.
+  device_info_plus: ^12.3.0
 
 dev_dependencies:
   flutter_test:
