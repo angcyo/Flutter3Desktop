@@ -120,7 +120,17 @@ Future<UiImage?> readClipboardImage() async =>
 /// 读取剪切板图片列表
 @allPlatformFlag
 Future<List<UiImage>> readClipboardImageList({
-  List<DataFormat> formats = const [Formats.png, Formats.jpeg],
+  List<DataFormat> formats = const [
+    Formats.png,
+    Formats.jpeg,
+    Formats.bmp,
+    Formats.gif,
+    Formats.ico,
+    Formats.webp,
+    Formats.tiff,
+    Formats.heic,
+    Formats.heif,
+  ],
 }) async {
   final List<UiImage> result = [];
   await eachReadClipboardValue((format, value) async {
