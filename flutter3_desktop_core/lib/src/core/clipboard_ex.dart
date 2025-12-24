@@ -117,6 +117,23 @@ Future<Uint8List?> readClipboardImageBytes() async {
 Future<UiImage?> readClipboardImage() async =>
     (await readClipboardImageBytes())?.toImage();
 
+/// 读取剪切板图片列表
+@allPlatformFlag
+Future<List<UiImage>> readClipboardImageList() async {
+  final List<UiImage> result = [];
+  await eachReadClipboardValue((format, value) async {
+    //debugger();
+    if (format == Formats.png || format == Formats.jpeg) {
+      if (value is DataReaderFile) {
+        final bytes = await value.readAll();
+        final image = await bytes.toImage();
+        result.add(image);
+      }
+    }
+  });
+  return result;
+}
+
 /// 读取剪切板文本
 @allPlatformFlag
 Future<String?> readClipboardText() async {
@@ -141,8 +158,23 @@ Future<NamedUri?> readClipboardUri() =>
 
 /// 读取剪切板文件
 @allPlatformFlag
-Future<Uri?> readClipboardUFileUri() =>
+Future<Uri?> readClipboardFileUri() =>
     readClipboardValue(Formats.fileUri, Formats.fileUri);
+
+/// 读取剪切板文件列表
+@allPlatformFlag
+Future<List<Uri>> readClipboardFileUriList() async {
+  final List<Uri> result = [];
+  await eachReadClipboardValue((format, value) {
+    //debugger();
+    if (format == Formats.fileUri) {
+      if (value is Uri) {
+        result.add(value);
+      }
+    }
+  });
+  return result;
+}
 
 //MARK: - write
 
