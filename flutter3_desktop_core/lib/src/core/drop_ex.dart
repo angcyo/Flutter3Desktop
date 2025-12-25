@@ -269,7 +269,7 @@ extension DropSessionEx on DropSession {
               return true;
             }());
           },
-          allowVirtualFiles: false,
+          allowVirtualFiles: false /*macOS上从飞书拖拽图片过来会崩溃*/,
         );
       } else {
         completer.complete();
