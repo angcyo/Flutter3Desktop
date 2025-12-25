@@ -64,7 +64,11 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
         }
       },
       onPerformDrop: (event) async {
-        await onSelfHandleDropDone(context, event);
+        try {
+          await onSelfHandleDropDone(context, event);
+        } catch (e) {
+          printError(e);
+        }
       },
       child: child,
     );
@@ -98,17 +102,21 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
     BuildContext context,
     PerformDropEvent event,
   ) async {
+    final uris = await event.session.uris;
+    final texts = await event.session.texts;
+    //final imagesBytes = await event.session.imagesBytes;
+    final images = await event.session.images;
+    final dropStateInfo = DropStateInfo(
+      DropStateEnum.done,
+      dropTextList: texts,
+      dropUriList: uris,
+      /*dropImageBytesList:  imagesBytes,*/
+      dropImageList: images,
+    );
     /*assert(() {
       debugger();
       return true;
     }());*/
-    final dropStateInfo = DropStateInfo(
-      DropStateEnum.done,
-      dropTextList: await event.session.texts,
-      dropUriList: await event.session.uris,
-      /*dropImageBytesList: await event.session.imagesBytes,*/
-      dropImageList: await event.session.images,
-    );
     dropStateInfoSignal.value = dropStateInfo;
     return dropStateInfo;
   }
@@ -184,17 +192,7 @@ extension DropSessionEx on DropSession {
 
   /// 获取所有图片字节数据
   Future<List<Uint8List>> get imagesBytes async {
-    List<SimpleFileFormat> formats = const [
-      Formats.png,
-      Formats.jpeg,
-      Formats.bmp,
-      Formats.gif,
-      Formats.ico,
-      Formats.webp,
-      Formats.tiff,
-      Formats.heic,
-      Formats.heif,
-    ];
+    List<SimpleFileFormat> formats = imageFormats;
     return [
       for (final format in formats) ...(await getFileValueList(format, format)),
     ];
@@ -202,17 +200,7 @@ extension DropSessionEx on DropSession {
 
   /// 获取所有图片对象
   Future<List<UiImage>> get images async {
-    List<SimpleFileFormat> formats = const [
-      Formats.png,
-      Formats.jpeg,
-      Formats.bmp,
-      Formats.gif,
-      Formats.ico,
-      Formats.webp,
-      Formats.tiff,
-      Formats.heic,
-      Formats.heif,
-    ];
+    List<SimpleFileFormat> formats = imageFormats;
     List<UiImage> images = [];
     for (final format in formats) {
       final list = await getFileValueList(format, format);
@@ -268,16 +256,20 @@ extension DropSessionEx on DropSession {
           valueFormat,
           (file) async {
             final bytes = await file.readAll();
-            result.add(bytes);
+            if (bytes.isNotEmpty) {
+              result.add(bytes);
+            }
             completer.complete();
           },
           onError: (error) {
+            debugger();
             completer.complete();
             assert(() {
               printError(error);
               return true;
             }());
           },
+          allowVirtualFiles: false,
         );
       } else {
         completer.complete();

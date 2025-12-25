@@ -8,6 +8,19 @@ part of '../../flutter3_desktop_core.dart';
 
 //MARK: - read
 
+/// 图片格式
+const List<SimpleFileFormat> imageFormats = [
+  Formats.png,
+  Formats.jpeg,
+  Formats.bmp,
+  Formats.gif,
+  Formats.ico,
+  Formats.webp,
+  Formats.tiff,
+  Formats.heic,
+  Formats.heif,
+];
+
 /// 枚举读取系统剪切板数据
 /// - [ValueFormat]  数值类型返回数据
 ///   - [SimpleValueFormat]
@@ -120,17 +133,7 @@ Future<UiImage?> readClipboardImage() async =>
 /// 读取剪切板图片列表
 @allPlatformFlag
 Future<List<UiImage>> readClipboardImageList({
-  List<DataFormat> formats = const [
-    Formats.png,
-    Formats.jpeg,
-    Formats.bmp,
-    Formats.gif,
-    Formats.ico,
-    Formats.webp,
-    Formats.tiff,
-    Formats.heic,
-    Formats.heif,
-  ],
+  List<DataFormat> formats = imageFormats,
 }) async {
   final List<UiImage> result = [];
   await eachReadClipboardValue((format, value) async {
@@ -138,8 +141,10 @@ Future<List<UiImage>> readClipboardImageList({
     if (formats.contains(format)) {
       if (value is DataReaderFile) {
         final bytes = await value.readAll();
-        final image = await bytes.toImage();
-        result.add(image);
+        if (bytes.isNotEmpty) {
+          final image = await bytes.toImage();
+          result.add(image);
+        }
       }
     }
   });
