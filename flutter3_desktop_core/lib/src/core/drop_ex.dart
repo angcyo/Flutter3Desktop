@@ -5,21 +5,31 @@ part of '../../flutter3_desktop_core.dart';
 /// @date 2025/01/06
 ///
 /// 1. 使用[buildDropRegion]创建拖拽区域
-/// 2. 重写[onHandleDropDone]方法实现拖拽完成事件
+/// 2. 重写[onSelfHandleDropDone]方法实现拖拽完成事件
 ///
+/// # super_drag_and_drop: ^0.9.1
 /// https://pub.dev/packages/super_drag_and_drop
+///
 /// [DropRegion]
 mixin DropStateMixin<T extends StatefulWidget> on State<T> {
   /// 当前的拖拽状态
+  @observeFlag
   final dropStateInfoSignal = $signal<DropStateInfo>();
 
   /// 是否需要一直触发拖拽悬停信号, 关闭后节省性能
+  @configProperty
   bool needDropOverSignal = false;
 
   /// 当前是否处于拖拽悬停状态
   bool get isDropOverMixin =>
       dropStateInfoSignal.value?.state.isDropOver == true;
 
+  /// 调用此方法, 创建可拖动的区域, 并构建对应的拖拽效果
+  /// - [formats] 支持的格式
+  ///
+  /// - [DropStateInfo]当前的拖拽状态
+  ///
+  /// 通过覆盖[onSelfHandleDropDone]方法, 处理拖拽完成事件
   @callPoint
   Widget buildDropRegion(
     BuildContext context,
@@ -54,11 +64,11 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
         }
       },
       onPerformDrop: (event) async {
-        await onHandleDropDone(event);
+        await onSelfHandleDropDone(context, event);
       },
       child: child,
     );
-    //--
+    //--other library
     /*return DropTarget(
       onDragEntered: (details) {
         print("onDragEntered");
@@ -84,13 +94,23 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
   /// 通过[PerformDropEvent.session.texts]拿到文本信息, 自行处理
   /// 通过[PerformDropEvent.session.uris]拿到文件Uri信息, 自行处理
   @overridePoint
-  FutureOr onHandleDropDone(PerformDropEvent event) async {
-    dropStateInfoSignal.value = DropStateInfo(
+  FutureOr<DropStateInfo> onSelfHandleDropDone(
+    BuildContext context,
+    PerformDropEvent event,
+  ) async {
+    /*assert(() {
+      debugger();
+      return true;
+    }());*/
+    final dropStateInfo = DropStateInfo(
       DropStateEnum.done,
       dropTextList: await event.session.texts,
       dropUriList: await event.session.uris,
+      /*dropImageBytesList: await event.session.imagesBytes,*/
       dropImageList: await event.session.images,
     );
+    dropStateInfoSignal.value = dropStateInfo;
+    return dropStateInfo;
   }
 }
 
@@ -114,12 +134,16 @@ class DropStateInfo {
   final List<Uri>? dropUriList;
 
   /// 拖拽图片字节数据列表
-  final List<Uint8List>? dropImageList;
+  final List<Uint8List>? dropImageBytesList;
+
+  /// 拖拽图片列表
+  final List<UiImage>? dropImageList;
 
   const DropStateInfo(
     this.state, {
     this.dropTextList,
     this.dropUriList,
+    this.dropImageBytesList,
     this.dropImageList,
   });
 
@@ -140,14 +164,15 @@ enum DropStateEnum {
   over,
 
   /// 拖拽完成
-  done,
-  ;
+  done;
 
   /// 正处于拖拽悬停
   bool get isDropOver =>
       this == DropStateEnum.entered || this == DropStateEnum.over;
 }
 
+/// - [DropSession]扩展
+/// - [DropSession.items]拖拽的数据
 /// `super_drag_and_drop`
 extension DropSessionEx on DropSession {
   /// 获取所有文本路径
@@ -158,28 +183,71 @@ extension DropSessionEx on DropSession {
   Future<List<Uri>> get uris => getValueList(Formats.fileUri, Formats.fileUri);
 
   /// 获取所有图片字节数据
-  Future<List<Uint8List>> get images =>
-      getFileValueList(Formats.png, Formats.png);
+  Future<List<Uint8List>> get imagesBytes async {
+    List<SimpleFileFormat> formats = const [
+      Formats.png,
+      Formats.jpeg,
+      Formats.bmp,
+      Formats.gif,
+      Formats.ico,
+      Formats.webp,
+      Formats.tiff,
+      Formats.heic,
+      Formats.heif,
+    ];
+    return [
+      for (final format in formats) ...(await getFileValueList(format, format)),
+    ];
+  }
+
+  /// 获取所有图片对象
+  Future<List<UiImage>> get images async {
+    List<SimpleFileFormat> formats = const [
+      Formats.png,
+      Formats.jpeg,
+      Formats.bmp,
+      Formats.gif,
+      Formats.ico,
+      Formats.webp,
+      Formats.tiff,
+      Formats.heic,
+      Formats.heif,
+    ];
+    List<UiImage> images = [];
+    for (final format in formats) {
+      final list = await getFileValueList(format, format);
+      for (final bytes in list) {
+        images.add(await bytes.toImage());
+      }
+    }
+    return images;
+  }
 
   /// 获取所有文件路径
   Future<List<T>> getValueList<T extends Object>(
-      DataFormat dataFormat, ValueFormat<T> valueFormat) async {
+    DataFormat dataFormat,
+    ValueFormat<T> valueFormat,
+  ) async {
     List<T> result = [];
     await items.asyncForEach((item, completer) {
       final reader = item.dataReader;
       if (reader != null && reader.canProvide(dataFormat)) {
-        reader.getValue<T>(valueFormat, (value) {
-          if (value != null) {
-            result.add(value);
-          }
-          completer.complete();
-        }, onError: (error) {
-          completer.complete();
-          assert(() {
-            printError(error);
-            return true;
-          }());
-        });
+        reader.getValue<T>(
+          valueFormat,
+          (value) {
+            if (value != null) {
+              result.add(value);
+            }
+            completer.complete();
+          },
+          onError: (error) {
+            completer.complete();
+            assert(() {
+              printError(error);
+              return true;
+            }());
+          },
+        );
       } else {
         completer.complete();
       }
@@ -189,22 +257,28 @@ extension DropSessionEx on DropSession {
 
   /// 获取所有图片字节数据
   Future<List<Uint8List>> getFileValueList<T extends Object>(
-      DataFormat dataFormat, FileFormat valueFormat) async {
+    DataFormat dataFormat,
+    FileFormat valueFormat,
+  ) async {
     List<Uint8List> result = [];
     await items.asyncForEach((item, completer) {
       final reader = item.dataReader;
       if (reader != null && reader.canProvide(dataFormat)) {
-        reader.getFile(valueFormat, (file) async {
-          final bytes = await file.readAll();
-          result.add(bytes);
-          completer.complete();
-        }, onError: (error) {
-          completer.complete();
-          assert(() {
-            printError(error);
-            return true;
-          }());
-        });
+        reader.getFile(
+          valueFormat,
+          (file) async {
+            final bytes = await file.readAll();
+            result.add(bytes);
+            completer.complete();
+          },
+          onError: (error) {
+            completer.complete();
+            assert(() {
+              printError(error);
+              return true;
+            }());
+          },
+        );
       } else {
         completer.complete();
       }
