@@ -104,13 +104,13 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
   ) async {
     final uris = await event.session.uris;
     final texts = await event.session.texts;
-    //final imagesBytes = await event.session.imagesBytes;
+    //final imageBytes = await event.session.imageBytes;
     final images = await event.session.images;
     final dropStateInfo = DropStateInfo(
       DropStateEnum.done,
       dropTextList: texts,
       dropUriList: uris,
-      /*dropImageBytesList:  imagesBytes,*/
+      /*dropImageBytesList:  imageBytes,*/
       dropImageList: images,
     );
     /*assert(() {
@@ -191,7 +191,7 @@ extension DropSessionEx on DropSession {
   Future<List<Uri>> get uris => getValueList(Formats.fileUri, Formats.fileUri);
 
   /// 获取所有图片字节数据
-  Future<List<Uint8List>> get imagesBytes async {
+  Future<List<Uint8List>> get imageBytes async {
     List<SimpleFileFormat> formats = imageFormats;
     return [
       for (final format in formats) ...(await getFileValueList(format, format)),
