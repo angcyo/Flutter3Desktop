@@ -102,6 +102,7 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
     BuildContext context,
     PerformDropEvent event,
   ) async {
+    //event.session.fileBytes;
     final uris = await event.session.uris;
     final texts = await event.session.texts;
     //final imageBytes = await event.session.imageBytes;
@@ -194,6 +195,15 @@ extension DropSessionEx on DropSession {
   /// 获取所有文件路径
   Future<List<Uri>> get uris => getValueList(Formats.fileUri, Formats.fileUri);
 
+  /// 获取所有文件数据, 在macOS上没有权限访问的路径时, 需要直接使用文件数据
+  Future<List<(String, Uint8List)>> get fileBytes async {
+    List<(String, Uint8List)> result = [];
+    await eachReadSessionValue((format, value) {
+      debugger();
+    });
+    return result;
+  }
+
   /// 获取所有图片字节数据
   Future<List<Uint8List>> get imageBytes async {
     List<SimpleFileFormat> formats = imageFormats;
@@ -213,6 +223,42 @@ extension DropSessionEx on DropSession {
       }
     }
     return images;
+  }
+
+  @allPlatformFlag
+  Future eachReadSessionValue(
+    FutureOr Function(DataFormat format, dynamic value) callback,
+  ) async {
+    await items.asyncForEach((item, completer) async {
+      debugger();
+      for (final format in Formats.standardFormats) {
+        final reader = item.dataReader;
+        if (item.canProvide(format)) {
+          if (format is ValueFormat) {
+            reader?.getValue(format, (value) async {
+              await callback(format, value);
+            });
+          } else if (format is FileFormat) {
+            String? fileName;
+            Uint8List? bytes;
+            reader?.getFile(format, (file) async {
+              fileName = file.fileName;
+              assert(() {
+                l.i(
+                  "eachReadSessionValue fileName:$fileName fileSize:${file.fileSize}",
+                );
+                return true;
+              }());
+              bytes = await file.readAll();
+              await callback(format, (fileName, bytes));
+            });
+          } else {
+            debugger();
+          }
+        }
+      }
+      completer.complete();
+    });
   }
 
   /// 获取所有文件路径
