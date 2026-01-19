@@ -34,7 +34,7 @@ dependencies:
   open_dir: ^0.0.2+1
 
   # https://pub.dev/packages/open_file
-  open_file: ^3.5.10
+  open_file: ^3.5.11
 
   # https://pub.dev/packages/tray_manager
   # https://pub.dev/packages/menu_base
