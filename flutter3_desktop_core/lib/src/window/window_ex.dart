@@ -437,7 +437,7 @@ Future<void> $saveWindowBounds() async {
       : "$isMaximized ${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}";
   $coreKeys.saveValue(kWindowBoundsKey, value);
   assert(() {
-    l.d("保存窗口位置->$value");
+    l.d("保存窗口位置->Maximized:$value");
     return true;
   }());
 }
