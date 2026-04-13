@@ -31,7 +31,7 @@ dependencies:
     git:
       url: git@github.com:FlutterStudioIst/super_native_extensions.git
       path: super_context_menu/
-      ref: 0.9.1-fix3
+      ref: 0.9.1-fix5
   # https://pub.dev/packages/pixel_snap
   pixel_snap: ^0.1.5
 

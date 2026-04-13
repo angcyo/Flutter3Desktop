@@ -46,7 +46,7 @@ dependencies:
     git:
       url: git@github.com:FlutterStudioIst/super_native_extensions.git
       path: super_drag_and_drop/
-      ref: 0.9.1-fix3
+      ref: 0.9.1-fix5
   # https://pub.dev/packages/super_clipboard
   # https://pub.dev/packages/collection
   # https://pub.dev/packages/meta
@@ -56,13 +56,13 @@ dependencies:
     git:
       url: git@github.com:FlutterStudioIst/super_native_extensions.git
       path: super_clipboard/
-      ref: 0.9.1-fix3
+      ref: 0.9.1-fix5
   #super_native_extensions: ^0.9.1
   super_native_extensions:
     git:
       url: git@github.com:FlutterStudioIst/super_native_extensions.git
       path: super_native_extensions/
-      ref: 0.9.1-fix3
+      ref: 0.9.1-fix5
 
   # https://pub.dev/packages/hotkey_manager
   hotkey_manager: ^0.2.3
