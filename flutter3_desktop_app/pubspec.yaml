@@ -26,7 +26,12 @@ dependencies:
   # https://pub.dev/packages/device_info_plus
   # https://pub.dev/packages/pixel_snap
   # https://pub.dev/packages/super_native_extensions
-  super_context_menu: ^0.9.1
+  #super_context_menu: ^0.9.1
+  super_context_menu:
+    git:
+      url: git@github.com:FlutterStudioIst/super_native_extensions.git
+      path: super_context_menu/
+      ref: 0.9.1-fix3
   # https://pub.dev/packages/pixel_snap
   pixel_snap: ^0.1.5
 
