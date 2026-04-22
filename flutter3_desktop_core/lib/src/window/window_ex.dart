@@ -38,7 +38,7 @@ Future initWindow({
   Size? maximumSize,
   bool? alwaysOnTop,
   bool? fullScreen,
-  Color? backgroundColor/*= Colors.transparent*/,
+  Color? backgroundColor /*= Colors.transparent*/,
   bool? skipTaskbar = false,
   String? title,
   TitleBarStyle? titleBarStyle = TitleBarStyle.normal,
@@ -145,8 +145,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   /// 是否需要关闭前确认
   bool get enableConfirmClose => false;
 
-  late final ScreenListenerImpl _screenListener =
-      ScreenListenerImpl(onScreenEventAction: onScreenEvent);
+  late final ScreenListenerImpl _screenListener = ScreenListenerImpl(
+    onScreenEventAction: onScreenEvent,
+  );
 
   @override
   void initState() {
@@ -204,10 +205,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
 
   /// [isMaximize] 窗口是否最大化
   /// [isUnmaximize] 窗口是否取消最大化
-  void _getWindowSize({
-    bool? isMaximize,
-    bool? isUnmaximize,
-  }) async {
+  void _getWindowSize({bool? isMaximize, bool? isUnmaximize}) async {
     final oldSize = windowSizeMixin;
     windowSizeMixin = await $wm.getSize();
     if (oldSize != windowSizeMixin ||
@@ -232,10 +230,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   /// 当窗口大小改变时触发
   /// [onWindowMaximize]
   @overridePoint
-  void onSelfWindowSizeChanged({
-    bool? isMaximize,
-    bool? isUnmaximize,
-  }) {
+  void onSelfWindowSizeChanged({bool? isMaximize, bool? isUnmaximize}) {
     $saveWindowBounds();
   }
 
@@ -293,7 +288,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   void onWindowFocus() {
     assert(() {
       () async {
-        l.v("onWindowFocus:${await $wm.isFocused()} isVisible:${await $wm.isVisible()}");
+        l.v(
+          "onWindowFocus:${await $wm.isFocused()} isVisible:${await $wm.isVisible()}",
+        );
       }();
       return true;
     }());
@@ -305,7 +302,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   void onWindowBlur() {
     assert(() {
       () async {
-        l.v("onWindowBlur-> Focus:${await $wm.isFocused()} isVisible:${await $wm.isVisible()}");
+        l.v(
+          "onWindowBlur-> Focus:${await $wm.isFocused()} isVisible:${await $wm.isVisible()}",
+        );
       }();
       return true;
     }());
@@ -471,9 +470,7 @@ Future<void> $saveWindowBounds() async {
 
 /// 恢复窗口大小/位置
 @api
-Future<bool> $restoreWindowBounds({
-  bool animate = false,
-}) async {
+Future<bool> $restoreWindowBounds({bool animate = false}) async {
   final pair = $getWindowBounds();
   if (pair != null) {
     final isMaximized = pair.$1;
@@ -487,10 +484,7 @@ Future<bool> $restoreWindowBounds({
         await $wm.maximize();
       }
     } else {
-      await $wm.setBounds(
-        bounds,
-        animate: animate,
-      );
+      await $wm.setBounds(bounds, animate: animate);
     }
     return true;
   }
@@ -505,8 +499,13 @@ var isRestoreMaximized = false;
 /// 在Flutter重启时, 恢复最大化恢复会有bug,
 /// Windows窗口虽然最大化了, 但是内部的界面却没有最大化
 /// 此方法在[State.reassemble]中调用, 以便修复bug
+///
+/// # 2026-4-22
+/// 已修复此bug
+///
 void $restoreMaximizedIfReassemble() {
   if (isRestoreMaximized && isWindows) {
+    l.w("恢复窗口最大化->");
     postFrame(() async {
       await $wm.unmaximize();
       await $wm.maximize();
