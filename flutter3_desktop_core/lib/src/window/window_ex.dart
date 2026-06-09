@@ -245,6 +245,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   //--
 
   /// close
+  /// 窗口关闭时触发
   @override
   void onWindowClose() async {
     assert(() {
