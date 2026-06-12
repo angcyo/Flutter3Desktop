@@ -114,10 +114,9 @@ mixin DropStateMixin<T extends StatefulWidget> on State<T> {
       /*dropImageBytesList:  imageBytes,*/
       dropImageList: images,
     );
-    assert(() {
+    if (isDebugType) {
       l.t("[${classHash()}]拖拽数据->uris:$uris texts:$texts images:$images");
-      return true;
-    }());
+    }
     /*assert(() {
       debugger();
       return true;
