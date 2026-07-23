@@ -157,6 +157,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
 
     if (enableConfirmClose) {
       () async {
+        //设置关闭拦截信号
         await $wm.setPreventClose(true);
         //updateState(); //需要?
       }();
@@ -255,29 +256,27 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     if (enableConfirmClose) {
       bool isPreventClose = await windowManager.isPreventClose();
       if (isPreventClose) {
-        showDialog(
-          context: buildContext!,
-          builder: (_) {
-            return AlertDialog(
-              title: Text('Are  you sure you want to close this window?'),
-              /*backgroundColor: Colors.redAccent,*/
-              actions: [
-                TextButton(
-                  child: Text('No'),
-                  onPressed: () {
-                    buildContext?.popDialog();
-                  },
-                ),
-                TextButton(
-                  child: Text('Yes'),
-                  onPressed: () {
-                    buildContext?.popDialog();
-                    windowManager.destroy();
-                  },
-                ),
-              ],
-            );
-          },
+        final libRes = buildContext?.libRes;
+        buildContext?.showWidgetDialog(
+          AlertDialog(
+            title: Text('确定要关闭程序?'),
+            backgroundColor: GlobalTheme.of(buildContext).dialogSurfaceBgColor,
+            actions: [
+              TextButton(
+                child: libRes?.libNo.text() ?? Text('否'),
+                onPressed: () {
+                  buildContext?.navigatorOf(true).pop();
+                },
+              ),
+              TextButton(
+                child: libRes?.libYes.text() ?? Text('是'),
+                onPressed: () {
+                  //buildContext?.popDialog();
+                  windowManager.destroy();
+                },
+              ),
+            ],
+          ),
         );
       }
     }
@@ -427,6 +426,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
 const kWindowBoundsKey = "_windowBounds";
 
 /// 保存窗口大小/位置
+/// - [$restoreWindowBounds] 恢复窗口大小/位置
 @api
 Future<void> $saveWindowBounds() async {
   //debugger();
