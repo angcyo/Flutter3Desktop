@@ -140,8 +140,9 @@ class ScreenListenerImpl with ScreenListener {
 ///
 /// `with WindowListener, WindowListenerMixin`
 ///
+/// - [enableConfirmClose] 是否需要关闭前确认
 mixin WindowListenerMixin<T extends StatefulWidget>
-    on State<T>, WindowListener {
+on State<T>, WindowListener {
   /// 是否需要关闭前确认
   bool get enableConfirmClose => false;
 
@@ -160,7 +161,8 @@ mixin WindowListenerMixin<T extends StatefulWidget>
         //设置关闭拦截信号
         await $wm.setPreventClose(true);
         //updateState(); //需要?
-      }();
+      }
+      ();
     }
 
     // 添加此行以覆盖默认关闭处理程序
@@ -188,7 +190,8 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     assert(() {
       () async {
         l.v("onScreenEvent->$eventName");
-      }();
+      }
+      ();
       return true;
     }());
   }
@@ -260,7 +263,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
         buildContext?.showWidgetDialog(
           AlertDialog(
             title: Text('确定要关闭程序?'),
-            backgroundColor: GlobalTheme.of(buildContext).dialogSurfaceBgColor,
+            backgroundColor: GlobalTheme
+                .of(buildContext)
+                .dialogSurfaceBgColor,
             actions: [
               TextButton(
                 child: libRes?.libNo.text() ?? Text('否'),
@@ -289,8 +294,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     assert(() {
       () async {
         l.v(
-          "onWindowFocus:${await $wm.isFocused()} isVisible:${await $wm.isVisible()}",
-        );
+            "onWindowFocus:${await $wm.isFocused
+            ()} isVisible:${await $wm.isVisible()}",
+      );
       }();
       return true;
     }());
@@ -303,8 +309,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     assert(() {
       () async {
         l.v(
-          "onWindowBlur-> Focus:${await $wm.isFocused()} isVisible:${await $wm.isVisible()}",
-        );
+            "onWindowBlur-> Focus:${await $wm.isFocused
+            ()} isVisible:${await $wm.isVisible()}",
+      );
       }();
       return true;
     }());
@@ -417,7 +424,8 @@ mixin WindowListenerMixin<T extends StatefulWidget>
         () async {
           l.v("onWindowEvent[${await $wm.getTitle()}]->$eventName");
         }();
-        return true;
+        return
+        true;
       }());
     }
   }
@@ -434,7 +442,8 @@ Future<void> $saveWindowBounds() async {
   final bounds = isMaximized ? ($getWindowBounds()?.$2) : await $wm.getBounds();
   final value = bounds == null
       ? "$isMaximized"
-      : "$isMaximized ${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}";
+      : "$isMaximized ${bounds.left} ${bounds.top} ${bounds.width} ${bounds
+      .height}";
   $coreKeys.saveValue(kWindowBoundsKey, value);
   assert(() {
     l.d("保存窗口位置->Maximized:$value");
