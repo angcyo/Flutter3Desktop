@@ -1,4 +1,8 @@
-part of '../../flutter3_desktop_core.dart';
+import 'package:flutter/material.dart';
+import 'package:screen_retriever/screen_retriever.dart';
+import 'package:window_manager/window_manager.dart';
+
+import '../../flutter3_desktop_core.dart';
 
 ///
 /// @author <a href="mailto:angcyo@126.com">angcyo</a>
@@ -80,6 +84,8 @@ Future initWindow({
   });
 }
 
+typedef WindowCaptionTypedef = WindowCaption;
+
 /// 扩展
 ///
 /// - [WindowManager.setTitle] 设置窗口标题
@@ -131,6 +137,8 @@ class ScreenListenerImpl with ScreenListener {
     onScreenEventAction?.call(eventName);
   }
 }
+
+typedef WindowListenerTypedef = WindowListener;
 
 /// [WindowListener] 窗口事件混入
 /// https://github.com/leanflutter/window_manager/blob/main/README-ZH.md#%E7%9B%91%E5%90%AC%E4%BA%8B%E4%BB%B6

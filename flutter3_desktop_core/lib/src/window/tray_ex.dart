@@ -1,4 +1,6 @@
-part of '../flutter3_desktop_app.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter3_basics/flutter3_basics.dart';
+import 'package:tray_manager/tray_manager.dart';
 
 ///
 /// Email:angcyo@126.com
@@ -7,6 +9,8 @@ part of '../flutter3_desktop_app.dart';
 ///
 /// 系统托盘扩展
 TrayManager get $trayManager => TrayManager.instance;
+
+typedef TrayListenerTypedef = TrayListener;
 
 mixin TrayListenerStateMixin<T extends StatefulWidget>
     on State<T>, TrayListener {
@@ -49,21 +53,21 @@ mixin TrayListenerStateMixin<T extends StatefulWidget>
 }
 
 /// 设置系统托盘, 需要配合[TrayListenerStateMixin]使用
-/// [iconPath] 资产下的路径`isWindows ? 'assets/ico/app_icon.ico' : 'assets/ico/app_icon.png',`
+/// [iconAssetKey] 资产下的路径`isWindows ? 'assets/ico/app_icon.ico' : 'assets/ico/app_icon.png',`
 ///    - 如果图标为空, 则表示清除托盘
-Future<void> setSystemTray(
-  String? iconPath, {
+Future<void> setSystemTray({
+  String? iconAssetKey,
   //--
   List<MenuInfo>? menus,
-  menu_base.Menu? menu,
+  Menu? menu,
   //--
   String? title /*windows 下不可用, macOS可用*/,
   String? tooltip,
 }) async {
-  if (iconPath == null) {
+  if (iconAssetKey == null) {
     await trayManager.destroy();
   } else {
-    await trayManager.setIcon(iconPath);
+    await trayManager.setIcon(iconAssetKey);
   }
   if (title != null && !isWindows) {
     try {
@@ -81,7 +85,7 @@ Future<void> setSystemTray(
   /*await trayManager.setIcon(
     Platform.isWindows ? 'images/tray_icon.ico' : 'images/tray_icon.png',
   );*/
-  /*menu_base.Menu menu = menu_base.Menu(
+  /*Menu menu = Menu(
     items: [
       MenuItem(
         key: 'show_window',
@@ -94,9 +98,7 @@ Future<void> setSystemTray(
       ),
     ],
   );*/
-  menu ??= menu_base.Menu(
-    items: [...?menus?.map((e) => e._buildMenuBaseItem())],
-  );
+  menu ??= Menu(items: [...?menus?.map((e) => e._buildMenuBaseItem())]);
   await trayManager.setContextMenu(menu);
 }
 
@@ -145,12 +147,12 @@ class MenuInfo {
 
   //region --menu_base
 
-  menu_base.MenuItem _buildMenuBaseItem() {
+  MenuItem _buildMenuBaseItem() {
     if (menuType == MenuInfoType.separator) {
-      return menu_base.MenuItem.separator();
+      return MenuItem.separator();
     }
     if (menuType == MenuInfoType.checkbox) {
-      return menu_base.MenuItem.checkbox(
+      return MenuItem.checkbox(
         key: key,
         label: label,
         sublabel: sublabel,
@@ -160,7 +162,7 @@ class MenuInfo {
         onClick: onClick == null ? null : (menu) => onClick?.call(),
       );
     }
-    return menu_base.MenuItem(
+    return MenuItem(
       key: key,
       label: label,
       sublabel: sublabel,
@@ -173,15 +175,11 @@ class MenuInfo {
     );
   }
 
-  menu_base.Menu _buildMenuBase() {
-    return menu_base.Menu(
-      items: [
-        ...?children?.map((e) => e._buildMenuBaseItem()),
-      ],
-    );
+  Menu _buildMenuBase() {
+    return Menu(items: [...?children?.map((e) => e._buildMenuBaseItem())]);
   }
 
-//endregion --menu_base
+  //endregion --menu_base
 }
 
 /// 菜单类型
