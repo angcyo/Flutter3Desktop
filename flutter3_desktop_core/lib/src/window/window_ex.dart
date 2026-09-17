@@ -268,17 +268,17 @@ mixin WindowListenerMixin<T extends StatefulWidget>
         final libRes = buildContext?.libRes;
         buildContext?.showWidgetDialog(
           AlertDialog(
-            title: Text('确定要关闭程序?'),
+            title: (libRes?.libCloseWindowTip ?? '确定要关闭程序?').text(),
             backgroundColor: GlobalTheme.of(buildContext).dialogSurfaceBgColor,
             actions: [
               TextButton(
-                child: libRes?.libNo.text() ?? Text('否'),
+                child: (libRes?.libNo ?? '否').text(),
                 onPressed: () {
                   buildContext?.navigatorOf(true).pop();
                 },
               ),
               TextButton(
-                child: libRes?.libYes.text() ?? Text('是'),
+                child: (libRes?.libYes ?? '是').text(),
                 onPressed: () {
                   //buildContext?.popDialog();
                   windowManager.destroy();
