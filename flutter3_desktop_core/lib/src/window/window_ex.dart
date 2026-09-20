@@ -265,11 +265,16 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     if (enableConfirmClose) {
       bool isPreventClose = await windowManager.isPreventClose();
       if (isPreventClose) {
+        final globalTheme = GlobalTheme.of(buildContext);
         final libRes = buildContext?.libRes;
         buildContext?.showWidgetDialog(
           AlertDialog(
-            title: (libRes?.libCloseWindowTip ?? '确定要关闭程序?').text(),
-            backgroundColor: GlobalTheme.of(buildContext).dialogSurfaceBgColor,
+            title: (libRes?.libCloseWindowTip ?? '确定要关闭程序?').text(
+              textStyle: globalTheme.textGeneralStyle.copyWith(
+                fontSize: globalTheme.textInfoStyle.fontSize,
+              ),
+            ),
+            backgroundColor: globalTheme.dialogSurfaceBgColor,
             actions: [
               TextButton(
                 child: (libRes?.libNo ?? '否').text(),
