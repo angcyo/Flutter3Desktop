@@ -254,6 +254,8 @@ mixin WindowListenerMixin<T extends StatefulWidget>
 
   //--
 
+  bool _isShowCloseWindowTip = false;
+
   /// close
   /// 窗口关闭时触发
   @override
@@ -262,12 +264,16 @@ mixin WindowListenerMixin<T extends StatefulWidget>
       l.v("onWindowClose");
       return true;
     }());
+    if (_isShowCloseWindowTip) {
+      return;
+    }
     if (enableConfirmClose) {
       bool isPreventClose = await windowManager.isPreventClose();
       if (isPreventClose) {
         final globalTheme = GlobalTheme.of(buildContext);
         final libRes = buildContext?.libRes;
-        buildContext?.showWidgetDialog(
+        _isShowCloseWindowTip = true;
+        await buildContext?.showWidgetDialog(
           AlertDialog(
             title: (libRes?.libCloseWindowTip ?? '确定要关闭程序?').text(
               textStyle: globalTheme.textGeneralStyle.copyWith(
@@ -292,6 +298,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
             ],
           ),
         );
+        _isShowCloseWindowTip = false;
       }
     }
   }
