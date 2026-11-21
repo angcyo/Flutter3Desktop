@@ -254,12 +254,13 @@ mixin WindowListenerMixin<T extends StatefulWidget>
 
   //--
 
+  @tempFlag
   bool _isShowCloseWindowTip = false;
 
   /// close
   /// 窗口关闭时触发
   @override
-  void onWindowClose() async {
+  Future onWindowClose() async {
     assert(() {
       l.v("onWindowClose");
       return true;
@@ -292,7 +293,7 @@ mixin WindowListenerMixin<T extends StatefulWidget>
                 child: (libRes?.libYes ?? '是').text(),
                 onPressed: () {
                   //buildContext?.popDialog();
-                  windowManager.destroy();
+                  destroyWindow();
                 },
               ),
             ],
@@ -301,6 +302,11 @@ mixin WindowListenerMixin<T extends StatefulWidget>
         _isShowCloseWindowTip = false;
       }
     }
+  }
+
+  /// 销毁窗口
+  void destroyWindow() async {
+    await $wm.destroy();
   }
 
   /// [onWindowEvent]:focus
