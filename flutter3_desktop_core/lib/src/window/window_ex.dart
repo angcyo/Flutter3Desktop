@@ -265,6 +265,9 @@ mixin WindowListenerMixin<T extends StatefulWidget>
       l.v("onWindowClose");
       return true;
     }());
+    if (!canCloseWindow()) {
+      return;
+    }
     if (_isShowCloseWindowTip) {
       return;
     }
@@ -304,7 +307,15 @@ mixin WindowListenerMixin<T extends StatefulWidget>
     }
   }
 
+  /// 是否可以关闭窗口
+  @api
+  bool canCloseWindow() {
+    final closeSignal = WindowCloseScope.trigger(context, WindowCloseData());
+    return closeSignal.canDefaultHandle;
+  }
+
   /// 销毁窗口
+  @api
   void destroyWindow() async {
     await $wm.destroy();
   }
