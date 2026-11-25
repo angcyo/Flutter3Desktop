@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
@@ -311,7 +313,16 @@ mixin WindowListenerMixin<T extends StatefulWidget>
   @api
   bool canCloseWindow() {
     final closeSignal = WindowCloseScope.trigger(context, WindowCloseData());
-    return closeSignal.canDefaultHandle;
+    if (!closeSignal.canDefaultHandle) {
+      return false;
+    }
+    /*final navigator = context.navigatorMaybeOf();
+    if (navigator != null) {
+      final route = context.pageRoute;
+      final pages = navigator.getRoutePages();
+      debugger();
+    }*/
+    return true;
   }
 
   /// 销毁窗口
