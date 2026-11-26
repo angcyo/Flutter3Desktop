@@ -232,6 +232,19 @@ Future<void> writeClipboardValue(DataWriterItem item) async {
   return await clipboard.write([item]);
 }
 
+/// 写入文件到剪切板
+@allPlatformFlag
+Future<void> writeClipboardFile(Uri? fileUri) async {
+  if (fileUri == null) {
+    return;
+  }
+
+  final item = DataWriterItem();
+  item.add(Formats.fileUri(fileUri));
+
+  return await writeClipboardValue(item);
+}
+
 /// 写入图片到剪切板
 @allPlatformFlag
 Future<void> writeClipboardImage(UiImage? image) async {
